@@ -1,0 +1,66 @@
+#!/usr/bin/env node
+
+/* 
+ ***************************************************
+ *     APLICACIONES Y SERVICIOS EN LA NUBE         *
+ *                   ITESO                         *
+ *                                                 * 
+ *    Actividad 1: Diseño de un WebService         *
+ *    Codigo Base: Alvaro Parres (parres@iteso.mx) * 
+ *                                                 * 
+ *    Alumno: Mario Contreras                      *
+ *    Exp: 705080                                  *
+ *                                                 *
+ ***************************************************
+ */
+/* 
+ * Copyright 2017 Mario Contreras <marioc@nazul.net>.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+/**
+ * Module dependencies.
+ */
+
+var app = require('../app');
+
+var port = 3000;
+var server = app.listen(port);
+var addr = server.address();
+var bind = typeof addr === 'string'
+        ? 'pipe ' + addr
+        : 'port ' + addr.port;
+console.log('===Wine REST API===');
+console.log('Mario Contreras (705080)');
+console.log('Listening on ' + bind);
+console.log('');
+console.log('');
+console.log('       Add wine:');
+console.log('$ curl -H "Content-Type: application/json" -X POST -d \'{"name": "Wine1", "year": 2001, "grapes": "Grape1", "country": "Country1", "description": "Description1"}\' http://localhost:3000/wines');
+console.log('');
+console.log('    Delete wine:');
+console.log('$ curl -X DELETE http://localhost:3000/wines/588e62277ec492342ceea8cc');
+console.log('');
+console.log('    Update wine:');
+console.log('$ curl -H "Content-Type: application/json" -X PUT -d \'{"name": "Wine11", "year": 2011, "grapes": "Grape11", "country": "Country11", "description": "Description11"}\' http://localhost:3000/wines/588e62f67ec492342ceea8cd');
+console.log('');
+console.log('Find wine by ID:');
+console.log('$ curl -X GET http://localhost:3000/wines/588e62f67ec492342ceea8cd');
+console.log('');
+console.log(' List all wines:');
+console.log('$ curl -X GET http://localhost:3000/wines');
+console.log('');
+console.log('');
+
+// EOF
