@@ -1,9 +1,0 @@
-[submodule "asn_hw1_public"]
-	path = asn_hw1_public
-	url = https://github.com/Nazul/asn_hw1_public.git
-[submodule "ASN_LP1MS1"]
-	path = ASN_LP1MS1
-	url = https://github.com/Nazul/ASN_LP1MS1.git
-[submodule "ASN_LP1MS2"]
-	path = ASN_LP1MS2
-	url = https://github.com/Nazul/ASN_LP1MS2.git
