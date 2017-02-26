@@ -24,30 +24,31 @@ import mx.iteso.desi.cloud.keyvalue.KeyValueStoreFactory;
  */
 public class Config {
 
+    public static enum DYNAMODBCLIENTTYPE {
+        Local, Remote
+    }
+    
+    public static final DYNAMODBCLIENTTYPE DynamoDbClientType = DYNAMODBCLIENTTYPE.Remote;
+    
     // The type of key/value store you are using. Initially set to BERKELEY;
     // will be changed to DynamoDB in some phases.
-    public static final KeyValueStoreFactory.STORETYPE storeType = KeyValueStoreFactory.STORETYPE.BERKELEY;
+    //public static final KeyValueStoreFactory.STORETYPE storeType = KeyValueStoreFactory.STORETYPE.BERKELEY;
+    public static final KeyValueStoreFactory.STORETYPE storeType = KeyValueStoreFactory.STORETYPE.DYNAMODB;
     public static final String pathToDatabase = "C:\\Databases\\BerkeleyDB";
 
-    // Set to your Amazon Access Key ID
-    // NEVER SHARE THIS INFORMATION. SO PLEASE SET IT TO "" WHEN YOU UPLOAD YOUR HOMEWORK 
-    public static final String accessKeyID = "";
-
-    // Set to your Amazon Secret Access Key
-    // NEVER SHARE THIS INFORMATION. SO PLEASE SET IT TO "" WHEN YOU UPLOAD YOUR HOMEWORK 
-    public static final String secretAccessKey = "";
+    public static final String accessKeyID = "<useYourKey>";
+    public static final String secretAccessKey = "<useYourKey>";
 
     // Set to your Amazon REGION tu be used
-    public static final Regions amazonRegion = Regions.US_WEST_2;
+    public static final Regions amazonRegion = Regions.US_EAST_1;
 
     // Restrict the topics that should be indexed. For example, when this is
     // set to 'X', you should only index topics that start with an X.
     // Set this to "A" for local work, and to "Ar" for cloud tests..
-    public static final String filter = "";
+    public static final String filter = "Arab";
 
-    public static final String titleFileName = "labels_en.ttl";
-    public static final String imageFileName = "images_en.ttl";
-
+    public static final String titleFileName = "C:\\Databases\\TTL\\labels_en.ttl";
+    public static final String imageFileName = "C:\\Databases\\TTL\\images_en.ttl";
 }
 
 // EOF

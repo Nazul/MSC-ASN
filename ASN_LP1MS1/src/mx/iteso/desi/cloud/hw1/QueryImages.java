@@ -20,6 +20,7 @@ import java.util.Iterator;
 import java.util.HashSet;
 import mx.iteso.desi.cloud.keyvalue.KeyValueStoreFactory;
 import mx.iteso.desi.cloud.keyvalue.IKeyValueStorage;
+import mx.iteso.desi.cloud.keyvalue.PorterStemmer;
 
 /**
  *
@@ -36,35 +37,50 @@ public class QueryImages {
     }
 
     public Set<String> query(String word) {
-        // TODO: Return the set of URLs that match the given word,
-        //       or an empty set if there are no matches
-        return new HashSet<String>();
+        HashSet<String> retval = new HashSet<>();
+        String term = PorterStemmer.stem(word.toLowerCase());
+        HashSet<String> terms = (HashSet<String>) titleStore.get(term);
+
+        for (String t : terms) {
+            Set<String> images = imageStore.get(t);
+            for (String image : images) {
+                retval.add(image);
+            }
+        }
+        return retval;
     }
 
     public void close() {
-        // TODO: Close the databases
+        imageStore.close();
+        titleStore.close();
     }
 
     public static void main(String args[]) {
-        // TODO: Add your own name here
         System.out.println("*** Alumno: Mario Contreras (Exp: 705080)");
 
-        // TODO: get KeyValueStores
-        IKeyValueStorage imageStore = null;
-        IKeyValueStorage titleStore = null;
+        IKeyValueStorage imageStore;
+        IKeyValueStorage titleStore;
 
-        QueryImages myQuery = new QueryImages(imageStore, titleStore);
+        try {
+            imageStore = KeyValueStoreFactory.getNewKeyValueStore(Config.storeType, "images");
+            titleStore = KeyValueStoreFactory.getNewKeyValueStore(Config.storeType, "terms");
 
-        for (int i = 0; i < args.length; i++) {
-            System.out.println(args[i] + ":");
-            Set<String> result = myQuery.query(args[i]);
-            Iterator<String> iter = result.iterator();
-            while (iter.hasNext()) {
-                System.out.println("  - " + iter.next());
+            QueryImages myQuery = new QueryImages(imageStore, titleStore);
+
+            for (int i = 0; i < args.length; i++) {
+                System.out.println(args[i] + ":");
+                Set<String> result = myQuery.query(args[i]);
+                Iterator<String> iter = result.iterator();
+                while (iter.hasNext()) {
+                    System.out.println("  - " + iter.next());
+                }
             }
-        }
 
-        myQuery.close();
+            myQuery.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.err.println("Failed to complete the indexing pass -- exiting");
+        }
     }
 }
 
