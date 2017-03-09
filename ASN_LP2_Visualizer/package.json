@@ -1,6 +1,6 @@
 {
     "name": "ASN_LP2_Visualizer", "version": "1.0.0", "description": "ASN_LP2_Visualizer - ASN Practice 2 (Visualizer)", "keywords": ["util", "functional", "server", "client", "browser"], "author": "Mario Contreras <marioc@nazul.net>", "license": "Apache-2.0", "contributors": [], "dependencies": {
-    "express": "~3.3.5", "ejs": "*", "geohash": "*"
+          "aws-sdk":"*", "express": "~3.3.5", "ejs": "*", "geohash": "*"
   }, "scripts":{
 "start":"node visualizer.js"}
 

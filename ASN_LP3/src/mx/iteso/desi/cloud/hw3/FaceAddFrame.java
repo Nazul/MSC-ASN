@@ -15,6 +15,20 @@
  */
 package mx.iteso.desi.cloud.hw3;
 
+import com.amazonaws.auth.AWSStaticCredentialsProvider;
+import com.amazonaws.auth.BasicAWSCredentials;
+import com.amazonaws.services.s3.AmazonS3;
+import com.amazonaws.services.s3.AmazonS3ClientBuilder;
+import com.amazonaws.services.s3.model.PutObjectRequest;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import mx.iteso.desi.vision.ImagesMatUtils;
 import mx.iteso.desi.vision.WebCamStream;
 import org.opencv.core.Mat;
 
@@ -22,10 +36,17 @@ public class FaceAddFrame extends javax.swing.JFrame {
 
     WebCamStream webCam;
     Mat lastFrame;
+    AmazonS3 s3;
 
     public FaceAddFrame() {
-        this.webCam = new WebCamStream(0);
+        BasicAWSCredentials cred = new BasicAWSCredentials(Config.accessKeyID, Config.secretAccessKey);
+
+        this.webCam = new WebCamStream(Config.CAMERA);
         initComponents();
+        this.s3 = AmazonS3ClientBuilder.standard().withCredentials(new AWSStaticCredentialsProvider(cred)).withRegion(Config.amazonRegion).build();
+
+        // Center
+        this.setLocationRelativeTo(null);
     }
 
     @SuppressWarnings("unchecked")
@@ -120,15 +141,36 @@ public class FaceAddFrame extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void startButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_startButtonActionPerformed
-        // TODO
+        this.webCam.startStream(this.photoPanel);
+        this.startButton.setEnabled(false);
+        this.stopButton.setEnabled(true);
+        this.uploadButton.setEnabled(false);
     }//GEN-LAST:event_startButtonActionPerformed
 
     private void stopButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_stopButtonActionPerformed
-        // TODO
+        lastFrame = webCam.stopStream();
+        this.startButton.setEnabled(true);
+        this.stopButton.setEnabled(false);
+        this.uploadButton.setEnabled(lastFrame != null);
     }//GEN-LAST:event_stopButtonActionPerformed
 
+    private void upload(String filename) {
+        PutObjectRequest request = new PutObjectRequest(Config.srcBucket, "Faces/" + filename, new File(filename));
+        s3.putObject(request);
+    }
+
     private void uploadButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_uploadButtonActionPerformed
-        // TODO
+        try {
+            String filename = nameTextField.getText();
+            InputStream in = ImagesMatUtils.MatToInputStream(lastFrame);
+            Files.copy(in, Paths.get(filename), StandardCopyOption.REPLACE_EXISTING);
+            upload(filename);
+        } catch (Exception ex) {
+            Logger.getLogger(FaceAddFrame.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        nameTextField.setText("");
+        lastFrame = null;
+        uploadButton.setEnabled(false);
     }//GEN-LAST:event_uploadButtonActionPerformed
 
     private void closeWindow(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_closeWindow
@@ -144,3 +186,5 @@ public class FaceAddFrame extends javax.swing.JFrame {
     private javax.swing.JButton uploadButton;
     // End of variables declaration//GEN-END:variables
 }
+
+// EOF

@@ -24,19 +24,33 @@ var geoData;
 // in the file, which we then remember in the 'geoData' variable. Error 34
 // is 'file not found'.
 
-fs.readFile('./output/part-r-00000', 'utf8', function (err, data) {
-    if (err) {
-        if (err.errno == 34) {
-            console.log("Cannot find the file 'part-r-00000' - did you copy it from ");
-            console.log("your 'output' directory to the current directory?");
-            console.log("Try running 'cp ../output/part-r-00000 .'");
-            process.exit(1);
-        }
+//// Load EMR Results from S3.
+// Load AWS SDK - S3
+var S3 = require('aws-sdk/clients/s3');
+// S3 object
+var s3 = new S3();
 
-        console.log("Cannot read from 'part-r-00000': " + err);
-        process.exit(1);
-    }
-    geoData = data;
+// Credentials are loaded using profile
+var listParams = {
+    Bucket: 'ms705080-asn-lp2',
+    Delimiter: '',
+    Prefix: 'MR-Output/'
+};
+
+s3.listObjects(listParams, function (err, data) {
+    if (err)
+        throw err;
+    data.Contents.forEach(function (partFile, index) {
+        console.log("Processing " + partFile.Key);
+        var fileParams = {Bucket: 'ms705080-asn-lp2', Key: partFile.Key};
+        s3.getObject(fileParams, function (err, data) {
+            if (err) {
+                console.log(err, err.stack);      // an error occurred
+            } else {
+                geoData += data.Body.toString();  // successful response
+            }
+        });
+    });
 });
 
 // The line below tells Node to include a special header in the response that 

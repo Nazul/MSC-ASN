@@ -85,7 +85,9 @@
             // The DBpedia URL is already available as 'url' at this point, and the 
             // image URL is available as 'photo'. 
             
-            var contentString = 'TODO: Replace this (in index.ejs) with your HTML code';
+            contentString = '<a target="_blank" href="' + photo + '"><img src="' + photo + '" style="max-width: 150px; max-height: 150px" /></a>';
+            contentString += '<br />';
+            contentString += '<p>DBpedia URL: <a target="_blank" href="' + url +'">' + url + '</a></p>';
 
             // Now we create the info window (which is initially hidden)...
 

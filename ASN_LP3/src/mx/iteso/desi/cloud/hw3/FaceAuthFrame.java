@@ -15,6 +15,13 @@
  */
 package mx.iteso.desi.cloud.hw3;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.ByteBuffer;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import mx.iteso.desi.vision.ImagesMatUtils;
 import mx.iteso.desi.vision.WebCamStream;
 import org.opencv.core.Mat;
 
@@ -24,8 +31,10 @@ public class FaceAuthFrame extends javax.swing.JFrame {
     Mat lastFrame;
 
     public FaceAuthFrame() {
-        this.webCam = new WebCamStream(0);
+        this.webCam = new WebCamStream(Config.CAMERA);
         initComponents();
+        // Center
+        this.setLocationRelativeTo(null);
         startCam();
     }
 
@@ -102,13 +111,38 @@ public class FaceAuthFrame extends javax.swing.JFrame {
         if (f.name.isEmpty()) {
             this.nameTextField.setText("Not Match");
         } else {
-            this.nameTextField.setText(f.name + "(" + f.cofidence + ")");
+            this.nameTextField.setText(f.name + " (" + f.cofidence + ")");
         }
+        // Reset to try again
+        startCam();
     }//GEN-LAST:event_authButtonActionPerformed
+
+    private byte[] getBytesFromInputStream(InputStream is) throws IOException {
+        try (ByteArrayOutputStream os = new ByteArrayOutputStream();) {
+            byte[] buffer = new byte[0xFFFF];
+
+            for (int len; (len = is.read(buffer)) != -1;) {
+                os.write(buffer, 0, len);
+            }
+
+            os.flush();
+
+            return os.toByteArray();
+        }
+    }
 
     private Face doAuthLogic() {
         // TODO
-        Face face = null;
+        AWSFaceCompare fc = new AWSFaceCompare(Config.accessKeyID, Config.secretAccessKey, Config.amazonRegion, Config.srcBucket);
+        InputStream is = ImagesMatUtils.MatToInputStream(lastFrame);
+        Face face = new Face("", 0.0f);
+        try {
+            byte[] bytes = getBytesFromInputStream(is);
+            ByteBuffer bb = ByteBuffer.wrap(bytes);
+            face = fc.compare(bb);
+        } catch (IOException ex) {
+            Logger.getLogger(FaceAuthFrame.class.getName()).log(Level.SEVERE, null, ex);
+        }
 
         return face;
     }
@@ -123,3 +157,5 @@ public class FaceAuthFrame extends javax.swing.JFrame {
     private javax.swing.JPanel photoPanel;
     // End of variables declaration//GEN-END:variables
 }
+
+// EOF
