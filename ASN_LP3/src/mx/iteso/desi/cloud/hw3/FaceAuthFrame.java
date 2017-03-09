@@ -132,7 +132,6 @@ public class FaceAuthFrame extends javax.swing.JFrame {
     }
 
     private Face doAuthLogic() {
-        // TODO
         AWSFaceCompare fc = new AWSFaceCompare(Config.accessKeyID, Config.secretAccessKey, Config.amazonRegion, Config.srcBucket);
         InputStream is = ImagesMatUtils.MatToInputStream(lastFrame);
         Face face = new Face("", 0.0f);
